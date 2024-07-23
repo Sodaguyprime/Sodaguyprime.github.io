@@ -173,33 +173,53 @@
             color: #3498db;
         }
 
+        .video-wrapper {
+    position: relative;
+    padding-bottom: 56.25%; /* 16:9 aspect ratio */
+    height: 0;
+    overflow: hidden;
+    max-width: 100%;
+}
+
+.video-wrapper iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 5px;
+}
+        
         .recommendation {
-            background-color: #34495e;
-            padding: 10px;
-            margin-bottom: 10px;
-            border-radius: 5px;
-            transition: background-color 0.3s ease;
-        }
+    background-color: #34495e;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
 
-        .recommendation:hover {
-            background-color: #2c3e50;
-        }
+.recommendation:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
 
-        .recommendation img {
-            width: 100%;
-            border-radius: 5px;
-            margin-bottom: 10px;
-        }
+.recommendation iframe {
+    width: 100%;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
 
-        .recommendation h3 {
-            font-size: 1em;
-            margin-bottom: 5px;
-        }
+.recommendation h3 {
+    font-size: 1.1em;
+    margin-bottom: 5px;
+    color: #ecf0f1;
+}
 
-        .recommendation p {
-            font-size: 0.9em;
-            color: #bdc3c7;
-        }
+.recommendation p {
+    font-size: 0.9em;
+    color: #bdc3c7;
+    line-height: 1.4;
+}
 
         @media (min-width: 768px) {
             .content-container {
@@ -396,10 +416,13 @@
             <div class="side-bar">
                 <h2>Recommended</h2>
                 <div class="recommendation">
-                    <img src="https://via.placeholder.com/150" alt="Recommendation 1">
-                    <h3>Video Title 1</h3>
-                    <p>Short description of the video</p>
-                </div>
+   <div class="recommendation">
+    <div class="video-wrapper">
+        <iframe width="560" height="315" src="https://www.youtube.com/embed/XfRMu9rE9w8?si=Bj5MeShl-anc71ep" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+    </div>
+    <h3 id="recommended-title-1">Loading title...</h3>
+    <p id="recommended-description-1">Loading description...</p>
+</div>
                 <div class="recommendation">
                     <img src="https://via.placeholder.com/150" alt="Recommendation 2">
                     <h3>Video Title 2</h3>
@@ -437,22 +460,53 @@
         <p>&copy; 2024 SODA Player. All rights reserved.</p>
     </div>
 </footer>
-    <script>
-    var player;
+  <script>
+    var mainPlayer, recommendedPlayer;
+
     function onYouTubeIframeAPIReady() {
-        player = new YT.Player('youtube-player', {
+        mainPlayer = new YT.Player('youtube-player', {
             height: '360',
             width: '640',
             videoId: 'h31GuZ-MwQY',
             events: {
-                'onReady': onPlayerReady
+                'onReady': onMainPlayerReady
+            }
+        });
+
+        recommendedPlayer = new YT.Player('recommended-video-1', {
+            height: '315',
+            width: '560',
+            videoId: 'XfRMu9rE9w8',
+            events: {
+                'onReady': onRecommendedPlayerReady
             }
         });
     }
 
-    function onPlayerReady(event) {
-        var videoTitle = player.getVideoData().title;
+    function onMainPlayerReady(event) {
+        var videoTitle = mainPlayer.getVideoData().title;
         document.getElementById('video-title').textContent = videoTitle;
+    }
+
+    function onRecommendedPlayerReady(event) {
+        var videoTitle = recommendedPlayer.getVideoData().title;
+        document.getElementById('recommended-title-1').textContent = videoTitle;
+
+        // Fetch video description
+        fetchVideoDescription('XfRMu9rE9w8', 'recommended-description-1');
+    }
+
+    function fetchVideoDescription(videoId, elementId) {
+        var apiKey = 'YOUR_YOUTUBE_API_KEY'; // Replace with your actual YouTube API key
+        var url = `https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${videoId}&key=${apiKey}`;
+
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                var description = data.items[0].snippet.description;
+                document.getElementById(elementId).textContent = description.slice(0, 100) + '...'; // Truncate to 100 characters
+            })
+            .catch(error => console.error('Error:', error));
     }
 </script>
 </body>
