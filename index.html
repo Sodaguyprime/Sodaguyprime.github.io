@@ -501,8 +501,8 @@
     }
 
     function fetchVideoDescription(videoId, elementId) {
-        var apiKey = AIzaSyD6T7FL0L2v6kEX8S7rfAxHSzXEPNmEqS0; // Replace with your actual YouTube API key
-        var url = `https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${videoId}&key=${apiKey}`;
+        var apiKey // removed api key
+        var url = //removed api key
 
         fetch(url)
             .then(response => response.json())
